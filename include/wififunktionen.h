@@ -23,6 +23,7 @@
         public:
         ushort connectToWifi();
         ushort connectToAP();
+        void WifiOFF();
     };
 
 
