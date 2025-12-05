@@ -24,7 +24,7 @@
     class WifiFunktionen 
     {
         public:
-        ushort connectToWifi();
+        ushort connectToWifi(bool ForceAP=false);
         void WifiOFF();
     };
 

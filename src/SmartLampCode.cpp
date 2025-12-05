@@ -154,10 +154,9 @@ void setup() {
   if (digitalRead(ROT_SW)==LOW )
   {
     Serial.println("MIT AP-Mode-Starten!");
-    //if(myWifi.connectToAP() == WIFI_MODE_AP)
-    {
-      BlinkLight(4,100,100,100);    //Wifi verbunden, WEISS BLINKEN
-    }
+    myWifi.connectToWifi(true);
+    BlinkLight(4,100,100,100);    //Wifi verbunden, WEISS BLINKEN
+    
   }
   else
   {
@@ -165,18 +164,17 @@ void setup() {
       {
         BlinkLight(4,0,200,0);    //Wifi verbunden, GRÜN BLINKEN
       }
-      //else if(myWifi.connectToAP() == WIFI_MODE_AP)
+      else if( myWifi.connectToWifi(true))   //kein Wifi -> AP erstellen
       {
-        BlinkLight(4,0,0,200);    //Wifi verbunden, BLAU BLINKEN
-      }
-      //else
-      {
-        BlinkLight(4,200,0,0);    //Wifi verbunden, ROT BLINKEN
+        myWifi.connectToWifi(true);
+        BlinkLight(4,100,100,100);    //Wifi verbunden, WEISS BLINKEN
       }
   }
 
   // Route for SetupWifi
   server.on("/SetupWifi", HTTP_GET, handleSetupWIFI);
+  server.on("/setupwifi", HTTP_GET, handleSetupWIFI);
+  server.on("/Setupwifi", HTTP_GET, handleSetupWIFI);
   server.on("/SetupWifi", HTTP_POST, handlegetSetupWIFI);
   
   // Route for SmartLamp
@@ -193,28 +191,21 @@ void setup() {
   server.begin();
   Serial.println("WEBSERVER gestartet");
 
-  //MQTT starten
-  if ( WiFi.status()  == WL_CONNECTED )
-    {
-      // MQTT
-      Serial.print(CR "mqtt starteten   ");
-      mqttclient.setServer(mqttLink.c_str(), 1883);
-      mqttclient.setCallback(mqtt_callback); // Topics zum empfangen
-
-      if (mqtt_reconnect()) // Mqtt verbinden
-      {
-        Serial.println("... mqtt gestartet");
-        DoMQTT = true;
-        publishMQTT();
-      }
-      else
-      {
-        Serial.println("... mqtt ERROR");
-      }
+   //MQTT
+  Serial.print(CR "mqtt starteten   ");
+  mqttclient.setServer(mqttLink.c_str(), 1883);
+  mqttclient.setCallback(mqtt_callback);  //Topics zum empfangen
+  if (mqtt_reconnect() )   //Mqtt verbinden
+  {
+    Serial.print("... mqtt  ( ");
+    Serial.print(mqttLink.c_str());
+    Serial.println(" ) gestartet");
   }
   else
   {
-    Serial.println("... kein WIFI, kein mqtt");
+      Serial.print("... mqtt  ( ");
+    Serial.print(mqttLink.c_str());
+    Serial.println(" ) error");
   }
 
   Serial.println("SETUP complete...");
@@ -417,27 +408,29 @@ bool mqtt_reconnect() {
   int mqttConnectCnt=0;
   bool ReturnVal=false;
 
-  while ( !mqttclient.connected() && (mqttConnectCnt<3) ) 
+if (WiFi.isConnected())
   {
-    mqttConnectCnt++;
-    Serial.print(CR "Attempting MQTT connection..<"); Serial.print(mqttConnectCnt); Serial.print("> ");
-    // Attempt to connect
-    if (  mqttclient.connect("ESP_Client", mqttUser.c_str(), mqttKW.c_str())  ) 
+    while ( !mqttclient.connected() && (mqttConnectCnt<3) ) 
     {
-      Serial.println(" mqtt connected");
-      mqttConnectCnt=0;
-      ReturnVal=true;
-      // Subscribe
-      //mqttclient.subscribe("LuftCheck/#");
-      string myTopic; myTopic.clear(); myTopic.append(mqttTopic.c_str()); myTopic.append("/#");
-      mqttclient.subscribe( myTopic.c_str()  );
-    } 
-    else 
-    {
-      Serial.print(" mqtt failed, rc=");
-      Serial.print(mqttclient.state());
-      Serial.println(" try again in 2 seconds");
-      delay(2000);
+      mqttConnectCnt++;
+      Serial.print(CR "Attempting MQTT connection..<"); Serial.print(mqttConnectCnt); Serial.print("> ");
+      // Attempt to connect
+      if (  mqttclient.connect("ESP_Client", mqttUser.c_str(), mqttKW.c_str())  ) 
+      {
+        Serial.println(" mqtt connected");
+        mqttConnectCnt=0;
+        ReturnVal=true;
+        // Subscribe
+        string myTopic; myTopic.clear(); myTopic.append(mqttTopic.c_str()); myTopic.append("/#");
+        mqttclient.subscribe( myTopic.c_str()  );
+      } 
+      else 
+      {
+        Serial.print(" mqtt failed, rc=");
+        Serial.print(mqttclient.state());
+        Serial.println(" try again in 4 seconds");
+        delay(4000);
+      }
     }
   }
   return ReturnVal; 
@@ -445,10 +438,11 @@ bool mqtt_reconnect() {
 
 void mqtt_callback(char* topic, byte* message, unsigned int length) 
 {
+  Serial.println("mqtt_callback");
   Serial.print("mqtt-Message arrived on topic: ");
   Serial.print(topic);
   
-  Serial.print(" - Message: ");
+  Serial.print(" ,  Message: ");
   String messageTemp;
   for (int i = 0; i < length; i++) {
     messageTemp += (char)message[i];
@@ -493,18 +487,19 @@ void publishMQTT(void)
       if ( mqtt_reconnect() )
       {
         mqttclient.loop();
-
+        delay(100);
+        Serial.println( "  --  MQTT publish start ..");
         string myTopic;
         char myTopicTXT[7];
 
         utoa (level_R, myTopicTXT, 10);
         myTopic.clear(); myTopic.append(mqttTopic.c_str()); myTopic.append("/R");
         if ( mqttclient.publish( myTopic.c_str(), myTopicTXT) ) { Serial.println("published R "); }
-        
+        delay(100);
         utoa (level_G, myTopicTXT, 10);
         myTopic.clear(); myTopic.append(mqttTopic.c_str()); myTopic.append("/G");
         if ( mqttclient.publish(myTopic.c_str(), myTopicTXT) ) { Serial.println("published G "); }
-
+        delay(100);  
         utoa (level_B, myTopicTXT, 10);
         myTopic.clear(); myTopic.append(mqttTopic.c_str()); myTopic.append("/B");
         if ( mqttclient.publish(myTopic.c_str(), myTopicTXT) ) { Serial.println("published B "); }
@@ -936,7 +931,7 @@ void handleSetup(AsyncWebServerRequest *request)
     yield(); 
     String  HtmlPage="<html><meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=yes'> \n";
             HtmlPage+="<style>html {font-family: Arial; display: inline-block; text-align: center;}</style> \n";
-            HtmlPage+="<body><br><h4>Einstellungen gespeichert! <br> <h3><a href='/'>LuftCheck</a></body></html>";
+            HtmlPage+="<body><br><h4>Einstellungen gespeichert! <br> <h3><a href='/'>Startseite</a></body></html>";
     request->send(200, "text/html", HtmlPage);
   }
 

@@ -267,7 +267,7 @@ void WifiFunktionen::WifiOFF(void)
 }
 
 //connectToWifi Start ans check connection to Wifi
-ushort WifiFunktionen::connectToWifi(void)
+ushort WifiFunktionen::connectToWifi(bool ForceAP)
 {
   uint8_t maxWifiTry=10;
   
@@ -315,36 +315,38 @@ ushort WifiFunktionen::connectToWifi(void)
     int8_t connect_i = 0;
     uint8_t WifiTry = 0;
 
-    for (connect_i = 0; connect_i < 3; ++connect_i)
+    if (!ForceAP)
     {
-      if (WiFi.status() != WL_CONNECTED)
-      {
-        WifiTry = 0;
-        Serial.printf("\n \nWIFI connection %i \n", connect_i);
+          for (connect_i = 0; connect_i < 3; ++connect_i)
+          {
+            if (WiFi.status() != WL_CONNECTED)
+            {
+              WifiTry = 0;
+              Serial.printf("\n \nWIFI connection %i \n", connect_i);
 
-        yield();
-        WiFi.mode(WIFI_STA);
-        WiFi.setHostname(espHostname.c_str());
-        WiFi.disconnect();
-        delay(450);
-        
-        Serial.printf("WIFI connecting to %s : ", ssid[connect_i].c_str());
-        //Serial.printf("  PWD %s : ", password[connect_i].c_str());
-        
-        WiFi.begin(ssid[connect_i].c_str(), password[connect_i].c_str());
+              yield();
+              WiFi.mode(WIFI_STA);
+              WiFi.setHostname(espHostname.c_str());
+              WiFi.disconnect();
+              delay(450);
+              
+              Serial.printf("WIFI connecting to %s : ", ssid[connect_i].c_str());
+              //Serial.printf("  PWD %s : ", password[connect_i].c_str());
+              
+              WiFi.begin(ssid[connect_i].c_str(), password[connect_i].c_str());
 
-        while ((WiFi.status() != WL_CONNECTED) && (WifiTry < maxWifiTry))
-        {
-          delay(1500);
-          WifiTry++;
-          Serial.printf("%u ", WifiTry);
-        }
-      }
-    }
-
+              while ((WiFi.status() != WL_CONNECTED) && (WifiTry < maxWifiTry))
+              {
+                delay(1500);
+                WifiTry++;
+                Serial.printf("%u ", WifiTry);
+              }
+            }
+          }
+    }  //if (!ForceAP)
 
     // Endkontrolle
-    if (WiFi.status() == WL_CONNECTED)
+    if ( !ForceAP && (WiFi.status() == WL_CONNECTED))
     {
       Serial.print("\n>> WIFI connected: ");
       Serial.print(WiFi.SSID());

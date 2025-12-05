@@ -9,7 +9,7 @@
 // MacOS  : "r" 
 #define CR "\r\n"
 
-#define SWver "v1.1 202501"
+#define SWver "v1.1 202512"
 
 // Pins
 #define ROT_A    21    // Needs to be an interrupt pin 
