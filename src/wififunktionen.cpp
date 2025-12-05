@@ -203,46 +203,6 @@ String processorSetupWIFI(const String& var){
   return String();
 }
 
-
-
-
-//connectToAP Start an AP
-ushort WifiFunktionen::connectToAP(void)
-{
-    Serial.println(""); Serial.println("AP Start ...");
-    WiFi.mode(WIFI_AP);
-    
-    delay(100);
-    IPAddress Ip(192, 168, 0, 1);
-    IPAddress NMask(255, 255, 255, 0);
-    WiFi.softAPsetHostname("SmartLamp");
-    WiFi.softAPConfig(Ip, Ip, NMask);
-        
-    String APssid="SmartLamp_";         
-    APssid=APssid+WiFi.macAddress();
- 
-    delay(200);  
-    if (!WiFi.softAP(APssid.c_str()))     
-    {
-        Serial.println("Soft AP creation failed.");
-    }
-    else
-    {
-      delay(50);
-      Serial.println("");
-      Serial.println("LuftCheck-AccesPoint in Betrieb! ");
-      Serial.print("SSID: "); Serial.println(WiFi.softAPSSID());
-      Serial.print("IP: "); Serial.println(WiFi.softAPIP());
-      Serial.print("MAC: "); Serial.println(WiFi.macAddress());
-      Serial.print("connections: "); Serial.println(WiFi.softAPgetStationNum());
-      Serial.println("");
-    }
-
-    return WiFi.getMode();
-      //if (WiFi.getMode() == WIFI_MODE_AP)
-
-}
-
 void handlegetSetupWIFI(AsyncWebServerRequest *request) 
   {
     Serial.println("##WEBPAGE handlegetSetupWIFI");

@@ -1,6 +1,8 @@
 #ifndef WIFIFUNKTIONEN_H
 #define WIFIFUNKTIONEN_H
  
+   #include "WiFi.h"
+
     extern String ssid[3];
     extern String password[3];
     extern String espHostname;
@@ -9,6 +11,7 @@
     void writeFile(fs::FS &fs, const char * path, const char * message);
     
     ushort connectToWifi();
+    void WifiOFF(void);
     
     void handleSetupWIFI(AsyncWebServerRequest *request);
     void handlegetSetupWIFI(AsyncWebServerRequest *request);
@@ -22,7 +25,6 @@
     {
         public:
         ushort connectToWifi();
-        ushort connectToAP();
         void WifiOFF();
     };
 

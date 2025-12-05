@@ -154,7 +154,7 @@ void setup() {
   if (digitalRead(ROT_SW)==LOW )
   {
     Serial.println("MIT AP-Mode-Starten!");
-    if(myWifi.connectToAP() == WIFI_MODE_AP)
+    //if(myWifi.connectToAP() == WIFI_MODE_AP)
     {
       BlinkLight(4,100,100,100);    //Wifi verbunden, WEISS BLINKEN
     }
@@ -165,11 +165,11 @@ void setup() {
       {
         BlinkLight(4,0,200,0);    //Wifi verbunden, GRÜN BLINKEN
       }
-      else if(myWifi.connectToAP() == WIFI_MODE_AP)
+      //else if(myWifi.connectToAP() == WIFI_MODE_AP)
       {
         BlinkLight(4,0,0,200);    //Wifi verbunden, BLAU BLINKEN
       }
-      else
+      //else
       {
         BlinkLight(4,200,0,0);    //Wifi verbunden, ROT BLINKEN
       }
@@ -185,8 +185,8 @@ void setup() {
   server.onNotFound(handlenotFound);
 
   // Route for KALIBRATION
-  server.on("/setup", HTTP_GET, [](AsyncWebServerRequest *request)     { request->send_P(200, "text/html", SETUP_html, processor); });
-  server.on("/Setup", HTTP_GET, [](AsyncWebServerRequest *request)     { request->send_P(200, "text/html", SETUP_html, processor); });
+  server.on("/setup", HTTP_GET, [](AsyncWebServerRequest *request)     { request->send(200, "text/html", SETUP_html, processor); });
+  server.on("/Setup", HTTP_GET, [](AsyncWebServerRequest *request)     { request->send(200, "text/html", SETUP_html, processor); });
   server.on("/setup", HTTP_POST, handleSetup);
 
   yield();
@@ -768,7 +768,7 @@ void loop()
     previousMillis = currentMillis; 
     if (myWifi.connectToWifi() != WL_CONNECTED)
       {
-        myWifi.connectToAP();
+        //myWifi.connectToAP();
       }
   }
 
@@ -830,7 +830,7 @@ void handleRoot(AsyncWebServerRequest *request)
     if (request->hasParam(Parameter))  {  WEBcommand = request->getParam(Parameter)->value();   }
 
     Serial.print("WEBcommand: "); Serial.print(WEBcommand); Serial.print(">>"); Serial.println(rgb_werte);
-    request->send_P(200, "text/html", index_html); 
+    request->send(200, "text/html", index_html); 
 }
 
 bool GetAndWriteParameter(AsyncWebServerRequest *request, String Parametername, String &myValue) 
@@ -947,10 +947,10 @@ void handleledStatus(AsyncWebServerRequest *request) {
 Serial.println("##WEBPAGE handleledStatus");
 
   if(ledEIN==1){
-    request->send_P(200, "text/plain", "EIN" );
+    request->send(200, "text/plain", "EIN" );
   }
   else {
-    request->send_P(200, "text/plain", "AUS" );
+    request->send(200, "text/plain", "AUS" );
   }
 }
 
