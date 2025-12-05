@@ -140,6 +140,7 @@ void setup() {
   mqttKW = preferences.getString("mqttKW", "MqttKW");             Serial.printf("mqttKW: %s \n", mqttKW.c_str() );
   mqttTopic = preferences.getString("mqttTopic", "SmartLamp");       Serial.printf("mqttTopic: %s \n", mqttTopic.c_str() );
   mqttIntervall = preferences.getInt("mqttIntervall", 0);            Serial.printf("mqttIntervall: %i \n", mqttIntervall);
+  espBeschreibung = preferences.getString("espBeschreibung", "SmartLamp");     Serial.printf("espBeschreibung: %s \n", espBeschreibung.c_str() );
   preferences.end();
   Serial.println();
 
@@ -155,7 +156,7 @@ void setup() {
   {
     Serial.println("MIT AP-Mode-Starten!");
     myWifi.connectToWifi(true);
-    BlinkLight(4,100,100,100);    //Wifi verbunden, WEISS BLINKEN
+    BlinkLight(10,100,100,100);    //AP verbunden, WEISS BLINKEN
     
   }
   else
@@ -167,7 +168,7 @@ void setup() {
       else if( myWifi.connectToWifi(true))   //kein Wifi -> AP erstellen
       {
         myWifi.connectToWifi(true);
-        BlinkLight(4,100,100,100);    //Wifi verbunden, WEISS BLINKEN
+        BlinkLight(10,100,100,100);    //AP verbunden, WEISS BLINKEN
       }
   }
 
@@ -912,8 +913,9 @@ void handleSetup(AsyncWebServerRequest *request)
     Serial.println("##WEBPAGE handlesetCalValues");
     
     //List all parameters (Compatibility)
-    /*
+    
     int args = request->args();
+    /*
     for(int i=0;i<args;i++){
       Serial.printf("ARG[%s]: %s\n", request->argName(i).c_str(), request->arg(i).c_str());
     }

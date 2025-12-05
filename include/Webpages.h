@@ -40,7 +40,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0px 25px 25px 5px; 
+    padding: 0px 25px 0px 5px; 
     max-width: 600px;
     margin-inline: auto;
 }
@@ -53,7 +53,7 @@ h1 {
 
 .subtitle {
     font-size: 1.2rem;
-    margin-bottom: 1.5em;
+    margin-bottom: 0.5em;
     opacity: 0.7;
 }
 
