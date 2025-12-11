@@ -67,7 +67,7 @@ String dunkler = "DUNKLER";
 String heller = "HELLER";
 String rgb = "rgb";
 
-byte macadr[6];             // MAC address from WemosD1
+byte macadr[6];             // MAC address from ESP
 
 String rgb_werte ="";
 String WEBcommand = "";
