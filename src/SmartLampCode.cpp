@@ -135,11 +135,16 @@ void setup() {
   else                 { Serial.println("Mounting SPIFFS OK!");  }
   
   preferences.begin("calibration", true);
-  mqttLink = preferences.getString("mqttLink", "192.168.0.166");     Serial.printf("mqttLink: %s \n", mqttLink.c_str() );
-  mqttUser = preferences.getString("mqttUser", "Mqttuser");            Serial.printf("mqttUser: %s \n", mqttUser.c_str() );
-  mqttKW = preferences.getString("mqttKW", "MqttKW");             Serial.printf("mqttKW: %s \n", mqttKW.c_str() );
-  mqttTopic = preferences.getString("mqttTopic", "SmartLamp");       Serial.printf("mqttTopic: %s \n", mqttTopic.c_str() );
-  mqttIntervall = preferences.getInt("mqttIntervall", 0);            Serial.printf("mqttIntervall: %i \n", mqttIntervall);
+  mqttLink = preferences.getString("mqttLink", "broker.hivemq.com");
+  Serial.printf("mqttLink: %s \n", mqttLink.c_str());
+  mqttUser = preferences.getString("mqttUser", "");
+  Serial.printf("mqttUser: %s \n", mqttUser.c_str());
+  mqttKW = preferences.getString("mqttKW", "");
+  Serial.printf("mqttKW: %s \n", mqttKW.c_str());
+  mqttTopic = preferences.getString("mqttTopic", "HTLLEONDING/SmartLamp");
+  Serial.printf("mqttTopic: %s \n", mqttTopic.c_str());
+  mqttIntervall = preferences.getInt("mqttIntervall", 0);
+  Serial.printf("mqttIntervall: %i \n", mqttIntervall);
   espBeschreibung = preferences.getString("espBeschreibung", "SmartLamp");     Serial.printf("espBeschreibung: %s \n", espBeschreibung.c_str() );
   preferences.end();
   Serial.println();
